@@ -26,5 +26,5 @@
 
 ## Run the program
 ```bash
-java -jar out/maze2schema-1.1.jar --output="out/maze.nbt" --width=20 --height=20 --scale=5
+java -jar out/maze2schema-1.3.jar --output="out/maze.nbt" --width=20 --height=20 --scale=5
 ```
