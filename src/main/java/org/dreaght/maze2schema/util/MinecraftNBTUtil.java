@@ -15,7 +15,7 @@ public class MinecraftNBTUtil {
 
         public Block(int x, int y, int z) {
             this.x = x;
-            this.y = x;
+            this.y = y;
             this.z = z;
         }
     }
