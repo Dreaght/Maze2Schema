@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'application'
     id 'com.github.johnrengelman.shadow' version '7.1.2'
+    id 'maven-publish'
 }
 
 group = 'org.dreaght'
@@ -11,16 +12,23 @@ application {
     mainClass = 'org.dreaght.maze2schema.Maze2Schema'
 }
 
-jar {
-    enabled = false
-}
-
 shadowJar {
     def outputDir = project.hasProperty("outputDir") ? project.property("outputDir") : System.getenv("OUTPUT_DIR")
     if (outputDir != null) {
         destinationDirectory.set(new File(outputDir))
     }
-    archiveFileName = "Maze2Schema-${version}.jar"
+    archiveFileName = "maze2schema-${version}.jar"
+}
+
+publishing {
+    repositories {
+        mavenLocal()
+    }
+    publications {
+        myJava(MavenPublication) {
+            from components.java
+        }
+    }
 }
 
 repositories {
