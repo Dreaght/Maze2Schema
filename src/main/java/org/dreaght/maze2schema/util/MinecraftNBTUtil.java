@@ -1,14 +1,21 @@
 package org.dreaght.maze2schema.util;
 
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.DataFlavor;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-
 import net.querz.nbt.io.NBTUtil;
 import net.querz.nbt.io.NamedTag;
 import net.querz.nbt.io.SNBTUtil;
-import net.querz.nbt.tag.*;
+import net.querz.nbt.tag.CompoundTag;
+import net.querz.nbt.tag.IntTag;
+import net.querz.nbt.tag.ListTag;
+import net.querz.nbt.tag.StringTag;
 
 public class MinecraftNBTUtil {
 
@@ -19,6 +26,38 @@ public class MinecraftNBTUtil {
             this.x = x;
             this.y = y;
             this.z = z;
+        }
+    }
+
+    /**
+     * Saves the NBT representation of blocks to the system clipboard as a .nbt file.
+     *
+     * @param blocks list of blocks to encode
+     * @param useThread whether to save the clipboard content in a separate thread
+     * @throws IOException if serialization fails
+     */
+    public static void saveNBTToClipboard(List<Block> blocks, boolean useThread) {
+        Runnable saveTask = () -> {
+            Path tempFile = null;
+            try {
+                tempFile = Files.createTempFile("blocks", ".nbt");
+                saveBlocksToNBTFile(blocks, tempFile.toString());
+                File file = tempFile.toFile();
+
+                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                clipboard.setContents(new FileTransferable(file), null);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        };
+
+        if (useThread) {
+            Thread thread = new Thread(saveTask);
+            thread.setDaemon(true); // Ensure the thread does not prevent program termination
+            thread.start();
+        } else {
+            saveTask.run();
         }
     }
 
@@ -110,5 +149,31 @@ public class MinecraftNBTUtil {
         rootTag.put("DataVersion", new IntTag(3955));
 
         return rootTag;
+    }
+
+    private static class FileTransferable implements Transferable {
+        private final File file;
+
+        public FileTransferable(File file) {
+            this.file = file;
+        }
+
+        @Override
+        public DataFlavor[] getTransferDataFlavors() {
+            return new DataFlavor[]{DataFlavor.javaFileListFlavor};
+        }
+
+        @Override
+        public boolean isDataFlavorSupported(DataFlavor flavor) {
+            return DataFlavor.javaFileListFlavor.equals(flavor);
+        }
+
+        @Override
+        public Object getTransferData(DataFlavor flavor) {
+            if (isDataFlavorSupported(flavor)) {
+                return List.of(file);
+            }
+            return null;
+        }
     }
 }

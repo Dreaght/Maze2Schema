@@ -5,6 +5,7 @@
 - ***--width=20*** - _Maze width (not actual schematic size)_
 - ***--height=20*** - _Maze height (not actual schematic size)_
 - ***--scale=5*** - _Scale factor_
+- ***--gui*** - _Start as the GUI server_
 - ***--help*** - _Print help message_
 
 ![big_maze.png](docs/big_maze.png)

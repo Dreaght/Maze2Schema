@@ -84,7 +84,7 @@ public class MazeSchematicUtil {
         int y = y1;
 
         while (true) {
-            lineBlocks.add(new MinecraftNBTUtil.Block(x, 0, y));
+            lineBlocks.add(new MinecraftNBTUtil.Block(y, 0, x));
 
             if (x == x2 && y == y2) {
                 break;

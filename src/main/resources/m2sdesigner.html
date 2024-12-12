@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M2S Designer</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        #widthSlider {
+            position: absolute;
+            top: 20px;
+            left: 40px;
+            right: 20px;
+            height: 20px;
+        }
+
+        #heightSlider {
+            position: absolute;
+            top: 40px;
+            bottom: 20px;
+            left: 20px;
+            width: 20px;
+            writing-mode: vertical-lr;
+        }
+
+        canvas {
+            display: block;
+            position: absolute;
+        }
+    </style>
+</head>
+<body>
+<input type="range" id="widthSlider" class="slider" min="3" max="100" value="20">
+<input type="range" id="heightSlider" class="slider" min="3" max="100" value="20">
+<canvas id="mazeCanvas"></canvas>
+
+<script>
+    const mazeCanvas = document.getElementById('mazeCanvas');
+    const widthSlider = document.getElementById('widthSlider');
+    const heightSlider = document.getElementById('heightSlider');
+
+    let width = 20;
+    let height = 20;
+    let scale = 5;
+
+    const fetchMaze = async () => {
+        try {
+            const response = await fetch(`http://localhost:9603/get-maze?width=${width}&height=${height}&scale=${scale}`);
+            if (!response.ok) throw new Error("Failed to fetch maze");
+            const matrix = await response.json();
+            renderMaze(matrix);
+        } catch (error) {
+            console.error("Error fetching maze:", error);
+        }
+    };
+
+    const renderMaze = (matrix) => {
+        const ctx = mazeCanvas.getContext('2d');
+
+        // Determine available rendering space
+        const availableWidth = window.innerWidth - 80; // 40px padding on both sides
+        const availableHeight = window.innerHeight - 120; // 40px padding on both sides
+
+        // Calculate the cell size based on the available space and matrix dimensions
+        const cellWidth = availableWidth / matrix[0].length;  // Cell size based on width
+        const cellHeight = availableHeight / matrix.length;  // Cell size based on height
+
+        // We take the smaller of the two to ensure cells fit both horizontally and vertically
+        const cellSize = Math.min(cellWidth, cellHeight);
+
+        // Update canvas dimensions to fit the entire maze
+        mazeCanvas.width = cellSize * matrix[0].length;
+        mazeCanvas.height = cellSize * matrix.length;
+
+        // Position the canvas with the specified padding
+        mazeCanvas.style.left = `${(window.innerWidth - mazeCanvas.width) / 2}px`;
+        mazeCanvas.style.top = `${(window.innerHeight - mazeCanvas.height) / 2}px`;
+
+        ctx.clearRect(0, 0, mazeCanvas.width, mazeCanvas.height);
+
+        // Draw the matrix
+        for (let i = 0; i < matrix.length; i++) {
+            for (let j = 0; j < matrix[i].length; j++) {
+                ctx.fillStyle = matrix[i][j] === 1 ? 'black' : 'white';
+                ctx.fillRect(j * cellSize, i * cellSize, cellSize, cellSize);
+            }
+        }
+    };
+
+    const updateCanvas = () => {
+        fetchMaze();
+    };
+
+    // Event listeners for sliders
+    widthSlider.addEventListener('input', (event) => {
+        width = parseInt(event.target.value, 10);
+        updateCanvas();
+    });
+
+    heightSlider.addEventListener('input', (event) => {
+        height = parseInt(event.target.value, 10);
+        updateCanvas();
+    });
+
+    // Event listener for mouse wheel to adjust scale
+    document.addEventListener('wheel', (event) => {
+        if (event.deltaY !== 0) {
+            scale += event.deltaY > 0 ? 1 : -1;
+            scale = Math.max(1, scale); // Ensure scale is at least 1
+            updateCanvas();
+        }
+    });
+
+    // Adjust rendering on window resize
+    window.addEventListener('resize', updateCanvas);
+
+    // Initial render
+    updateCanvas();
+</script>
+</body>
+</html>
