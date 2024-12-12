@@ -12,15 +12,32 @@ import java.util.List;
 public class MazeSchematicUtil {
 
     /**
-     * Converts a given Maze to a Minecraft Schematic and saves it to the given filePath.
-     * Each wall in the maze is converted to a line of blocks in the schematic.
+     * Converts a given Maze to a Minecraft schematic file.
+     * Each wall in the maze is converted to a line of blocks.
      * The given scale is used to scale the coordinates of the maze.
      *
      * @param maze the Maze to convert
-     * @param filePath the path to save the Minecraft Schematic
+     * @param filePath the path to the file where the schematic should be saved
      * @param scale the scale to use when converting coordinates
      */
     public static void convertMazeToSchematic(Maze maze, String filePath, int scale) {
+        try {
+            MinecraftNBTUtil.saveBlocksToNBTFile(convertMazeToBlocks(maze, scale), filePath);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Converts a given Maze to a list of MinecraftNBTUtil.Blocks.
+     * Each wall in the maze is converted to a line of blocks.
+     * The given scale is used to scale the coordinates of the maze.
+     *
+     * @param maze the Maze to convert
+     * @param scale the scale to use when converting coordinates
+     * @return a list of MinecraftNBTUtil.Blocks
+     */
+    public static List<MinecraftNBTUtil.Block> convertMazeToBlocks(Maze maze, int scale) {
         List<MinecraftNBTUtil.Block> blocks = new ArrayList<>();
 
         for (Wall wall : maze.getWalls()) {
@@ -40,11 +57,7 @@ public class MazeSchematicUtil {
             }
         }
 
-        try {
-            MinecraftNBTUtil.saveBlocksToNBTFile(blocks,filePath);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        return blocks;
     }
 
     /**

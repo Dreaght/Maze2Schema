@@ -10,6 +10,7 @@ public class SchemaMazeArguments extends MazeArguments {
 
     private String filePath = "out/maze.nbt";
     private int scale = 5;
+    private boolean startAsServer = false;
 
     public SchemaMazeArguments(String[] args) {
         super(args);
@@ -22,6 +23,10 @@ public class SchemaMazeArguments extends MazeArguments {
             System.out.println("  --scale=5 - Scale factor");
             System.out.println("  --help - Show this help message");
             System.exit(0);
+        }
+
+        if (Arrays.asList(args).contains("--gui")) {
+            startAsServer = true;
         }
 
         for (int i = 0; i < args.length; i++) {

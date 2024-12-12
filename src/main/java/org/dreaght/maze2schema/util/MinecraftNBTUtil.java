@@ -6,6 +6,8 @@ import java.nio.file.Path;
 import java.util.List;
 
 import net.querz.nbt.io.NBTUtil;
+import net.querz.nbt.io.NamedTag;
+import net.querz.nbt.io.SNBTUtil;
 import net.querz.nbt.tag.*;
 
 public class MinecraftNBTUtil {
@@ -29,48 +31,8 @@ public class MinecraftNBTUtil {
      * @throws IOException if there is a problem writing to the file
      */
     public static void saveBlocksToNBTFile(List<Block> blocks, String path) throws IOException {
-        CompoundTag rootTag = new CompoundTag();
-
-        // Define size based on the range of blocks
-        int maxX = blocks.stream().mapToInt(b -> b.x).max().orElse(0) + 1;
-        int maxY = blocks.stream().mapToInt(b -> b.y).max().orElse(0) + 1;
-        int maxZ = blocks.stream().mapToInt(b -> b.z).max().orElse(0) + 1;
-
-        ListTag<IntTag> sizeTag = new ListTag(IntTag.class);
-        sizeTag.add(new IntTag(maxX));
-        sizeTag.add(new IntTag(maxY));
-        sizeTag.add(new IntTag(maxZ));
-        rootTag.put("size", sizeTag);
-
-        // Define entities (empty in this case)
-        ListTag<CompoundTag> entitiesTag = new ListTag(CompoundTag.class);
-        rootTag.put("entities", entitiesTag);
-
-        // Add blocks
-        ListTag<CompoundTag> blockList = new ListTag(CompoundTag.class);
-        for (Block block : blocks) {
-            CompoundTag blockTag = new CompoundTag();
-
-            ListTag<IntTag> posTag = new ListTag(IntTag.class);
-            posTag.add(new IntTag(block.x));
-            posTag.add(new IntTag(block.y));
-            posTag.add(new IntTag(block.z));
-            blockTag.put("pos", posTag);
-
-            blockTag.put("state", new IntTag(0));
-            blockList.add(blockTag);
-        }
-        rootTag.put("blocks", blockList);
-
-        // Define palette (single entry for stone)
-        ListTag<CompoundTag> paletteTag = new ListTag(CompoundTag.class);
-        CompoundTag stonePalette = new CompoundTag();
-        stonePalette.put("Name", new StringTag("minecraft:stone"));
-        paletteTag.add(stonePalette);
-        rootTag.put("palette", paletteTag);
-
-        // Define DataVersion
-        rootTag.put("DataVersion", new IntTag(3955));
+        CompoundTag rootTag = createNBTTag(blocks);
+        NamedTag namedTag = new NamedTag("", rootTag);
 
         // Generate the file
         Path outputPath = Path.of(path);
@@ -83,6 +45,70 @@ public class MinecraftNBTUtil {
         }
 
         // Write to file
-        NBTUtil.write(rootTag, file);
+        NBTUtil.write(namedTag, file);
+    }
+
+    /**
+     * Converts a list of blocks to an SNBT string representation.
+     *
+     * @param blocks list of blocks to encode
+     * @return SNBT string representation of the NBT data
+     */
+    public static String getSNBT(List<Block> blocks) throws IOException {
+        CompoundTag rootTag = createNBTTag(blocks);
+        return SNBTUtil.toSNBT(rootTag); // Converts the CompoundTag to a string
+    }
+
+    /**
+     * Creates the NBT tag structure for a given list of blocks.
+     *
+     * @param blocks list of blocks to encode
+     * @return CompoundTag representing the NBT data
+     */
+    private static CompoundTag createNBTTag(List<Block> blocks) {
+        CompoundTag rootTag = new CompoundTag();
+
+        // Define size based on the range of blocks
+        int maxX = blocks.stream().mapToInt(b -> b.x).max().orElse(0) + 1;
+        int maxY = blocks.stream().mapToInt(b -> b.y).max().orElse(0) + 1;
+        int maxZ = blocks.stream().mapToInt(b -> b.z).max().orElse(0) + 1;
+
+        ListTag<IntTag> sizeTag = new ListTag<>(IntTag.class);
+        sizeTag.add(new IntTag(maxX));
+        sizeTag.add(new IntTag(maxY));
+        sizeTag.add(new IntTag(maxZ));
+        rootTag.put("size", sizeTag);
+
+        // Define entities (empty in this case)
+        ListTag<CompoundTag> entitiesTag = new ListTag<>(CompoundTag.class);
+        rootTag.put("entities", entitiesTag);
+
+        // Add blocks
+        ListTag<CompoundTag> blockList = new ListTag<>(CompoundTag.class);
+        for (Block block : blocks) {
+            CompoundTag blockTag = new CompoundTag();
+
+            ListTag<IntTag> posTag = new ListTag<>(IntTag.class);
+            posTag.add(new IntTag(block.x));
+            posTag.add(new IntTag(block.y));
+            posTag.add(new IntTag(block.z));
+            blockTag.put("pos", posTag);
+
+            blockTag.put("state", new IntTag(0));
+            blockList.add(blockTag);
+        }
+        rootTag.put("blocks", blockList);
+
+        // Define palette (single entry for stone)
+        ListTag<CompoundTag> paletteTag = new ListTag<>(CompoundTag.class);
+        CompoundTag stonePalette = new CompoundTag();
+        stonePalette.put("Name", new StringTag("minecraft:stone"));
+        paletteTag.add(stonePalette);
+        rootTag.put("palette", paletteTag);
+
+        // Define DataVersion
+        rootTag.put("DataVersion", new IntTag(3955));
+
+        return rootTag;
     }
 }
