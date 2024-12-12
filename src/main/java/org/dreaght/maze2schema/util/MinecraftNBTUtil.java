@@ -2,6 +2,7 @@ package org.dreaght.maze2schema.util;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
 
 import net.querz.nbt.io.NBTUtil;
@@ -14,7 +15,7 @@ public class MinecraftNBTUtil {
 
         public Block(int x, int y, int z) {
             this.x = x;
-            this.y = y;
+            this.y = x;
             this.z = z;
         }
     }
@@ -23,11 +24,11 @@ public class MinecraftNBTUtil {
      * Writes a list of blocks to a Minecraft NBT file.
      *
      * @param blocks list of blocks to write
-     * @param file   file to write to
+     * @param path   directory path as a String where the file should be saved
      *
      * @throws IOException if there is a problem writing to the file
      */
-    public static void saveBlocksToNBTFile(List<Block> blocks, File file) throws IOException {
+    public static void saveBlocksToNBTFile(List<Block> blocks, String path) throws IOException {
         CompoundTag rootTag = new CompoundTag();
 
         // Define size based on the range of blocks
@@ -70,6 +71,16 @@ public class MinecraftNBTUtil {
 
         // Define DataVersion
         rootTag.put("DataVersion", new IntTag(3955));
+
+        // Generate the file
+        Path outputPath = Path.of(path);
+        File file = outputPath.toFile();
+        if (!file.getParentFile().exists() && !file.getParentFile().mkdirs()) {
+            throw new IOException("Failed to create output directory: " + file.getParentFile().getAbsolutePath());
+        }
+        if (!file.exists() && !file.createNewFile()) {
+            throw new IOException("Failed to create output file: " + file.getAbsolutePath());
+        }
 
         // Write to file
         NBTUtil.write(rootTag, file);

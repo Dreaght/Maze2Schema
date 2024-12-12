@@ -41,7 +41,7 @@ public class MazeSchematicUtil {
         }
 
         try {
-            MinecraftNBTUtil.saveBlocksToNBTFile(blocks, new File(filePath));
+            MinecraftNBTUtil.saveBlocksToNBTFile(blocks,filePath);
         } catch (IOException e) {
             e.printStackTrace();
         }
