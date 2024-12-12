@@ -6,16 +6,13 @@ import org.dreaght.maze2schema.util.MinecraftNBTUtil;
 import org.dreaght.snubsquaremaze.maze.Maze;
 import org.json.JSONArray;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.util.List;
 
 public class MazeBackend extends NanoHTTPD {
     public MazeBackend() throws IOException {
-        super(9603); // Run on port 8080
+        super(9603); // Run on port 9603
         start(SOCKET_READ_TIMEOUT, false);
         System.out.println("Server is running at http://localhost:9603");
     }
@@ -31,7 +28,7 @@ public class MazeBackend extends NanoHTTPD {
         response.addHeader("Access-Control-Allow-Headers", "Content-Type");
 
         if ("/get-maze".equals(uri)) {
-            // Handle the maze request (same as before)
+            // Handle the maze request
             int width = Integer.parseInt(session.getParms().get("width"));
             int height = Integer.parseInt(session.getParms().get("height"));
             int scale = Integer.parseInt(session.getParms().get("scale"));
@@ -44,33 +41,21 @@ public class MazeBackend extends NanoHTTPD {
 
         } else if ("/m2sdesigner.html".equals(uri)) {
             // Serve the HTML file
-            response = serveHtmlFile();
+            response = serveHtmlFile("m2sdesigner.html");
         }
 
         return response;
     }
 
-    // Method to serve the m2sdesigner.html file
-    private Response serveHtmlFile() {
-        try {
-            // Path to the HTML file inside the resources folder
-            ClassLoader classLoader = MazeBackend.class.getClassLoader();
-            URL resource = classLoader.getResource("m2sdesigner.html");
-            if (resource == null) {
-                return newFixedLengthResponse(Response.Status.NOT_FOUND, "text/html", "File not found");
-            }
-            File htmlFile = new File(resource.getFile());
-
-            if (htmlFile.exists()) {
-                InputStream fileStream = new FileInputStream(htmlFile);
-                long fileLength = htmlFile.length(); // Get the file size
-
-                // Return the response with the correct content length using newFixedLengthResponse
-                return newFixedLengthResponse(Response.Status.OK, "text/html", fileStream, fileLength);
-            } else {
+    // Method to serve the HTML file
+    private Response serveHtmlFile(String fileName) {
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(fileName)) {
+            if (inputStream == null) {
                 return newFixedLengthResponse(Response.Status.NOT_FOUND, "text/html", "File not found");
             }
 
+            byte[] content = inputStream.readAllBytes();
+            return newFixedLengthResponse(Response.Status.OK, "text/html", new String(content));
         } catch (IOException e) {
             e.printStackTrace();
             return newFixedLengthResponse(Response.Status.INTERNAL_ERROR, "text/html", "Error loading HTML file");
@@ -108,5 +93,4 @@ public class MazeBackend extends NanoHTTPD {
 
         return binaryMatrix;
     }
-
 }
