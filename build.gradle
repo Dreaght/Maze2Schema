@@ -15,7 +15,7 @@ application {
 shadowJar {
     def outputDir = project.hasProperty("outputDir") ? project.property("outputDir") : System.getenv("OUTPUT_DIR")
     if (outputDir != null) {
-        destinationDirectory.set(new File(outputDir))
+        destinationDirectory.set(new File(outputDir as String))
     }
     archiveFileName = "maze2schema-${version}.jar"
 }
@@ -32,7 +32,6 @@ publishing {
 }
 
 repositories {
-    mavenLocal()
     mavenCentral()
     maven {
         url 'https://maven.enginehub.org/repo/'
@@ -41,7 +40,7 @@ repositories {
 }
 
 dependencies {
-    implementation('org.dreaght:snubsquaremaze:1.0-SNAPSHOT')
+    implementation 'com.github.Dreaght:SnubSquareMaze:v1.1'
 
     implementation 'com.github.Querz:NBT:6.1'
 
@@ -52,7 +51,7 @@ dependencies {
 
     implementation 'org.nanohttpd:nanohttpd:2.3.1'
 
-    implementation 'org.json:json:20230618'
+    implementation 'org.json:json:20231013'
 }
 
 test {
