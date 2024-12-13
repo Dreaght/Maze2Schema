@@ -11,13 +11,18 @@
 ![big_maze.png](docs/big_maze.png)
 ![small_maze.png](docs/small_maze.png)
 
-# Usage without creating `.jar` file.
+# Run in GUI mode: `--gui` argument!
+![gui_showcase.gif](docs/gui_showcase.gif)
+* `.nbt` - Saved in real time!
+* **Scale**: Scroll the mouse; **Resize**: Move sliders.
+
+# [CLI] Usage without creating `.jar` file.
 
 ```bash
 ./gradlew run --args="--output=out/maze.nbt --width=20 --height=20 --scale=5"
 ```
 
-# Usage of `.jar` file.
+# [CLI] Usage of `.jar` file.
 
 ## Compile the project
 ```bash
@@ -28,3 +33,4 @@
 ```bash
 java -jar out/maze2schema-1.3.jar --output="out/maze.nbt" --width=20 --height=20 --scale=5
 ```
+
