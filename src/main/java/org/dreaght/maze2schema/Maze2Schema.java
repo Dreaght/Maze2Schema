@@ -25,6 +25,11 @@ public class Maze2Schema {
 
         Maze maze = new Maze(arguments);
 
-        MazeSchematicUtil.convertMazeToSchematic(maze, arguments.getFilePath(), arguments.getScale());
+        MazeSchematicUtil.convertMazeToSchematic(maze,
+                arguments.getFilePath()
+                        .replace("%SEED%", Long.toString(maze.getSeed()))
+                        .replace("%WIDTH%", Integer.toString(maze.getWidth()))
+                        .replace("%HEIGHT%", Integer.toString(maze.getHeight())),
+                arguments.getScale());
     }
 }

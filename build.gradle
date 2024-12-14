@@ -6,7 +6,7 @@ plugins {
 }
 
 group = 'org.dreaght'
-version = '1.3'
+version = '1.4-SNAPSHOT'
 
 application {
     mainClass = 'org.dreaght.maze2schema.Maze2Schema'
@@ -40,7 +40,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.Dreaght:SnubSquareMaze:v1.1'
+    implementation 'com.github.Dreaght:SnubSquareMaze:v1.2'
 
     implementation 'com.github.Querz:NBT:6.1'
 

@@ -22,6 +22,7 @@ public class SchemaMazeArguments extends MazeArguments {
             System.out.println("  --height=20 - Maze height (not actual schematic size)");
             System.out.println("  --scale=5 - Scale factor");
             System.out.println("  --gui - Start as the GUI server");
+            System.out.println("  --seed - Seed for the maze generation");
             System.out.println("  --help - Show this help message");
             System.exit(0);
         }
